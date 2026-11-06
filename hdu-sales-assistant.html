@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HDU Healthcare – Enquiry & Package Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f0;--card:#fff;--ink:#10292c;--mut:#5b6f70;--line:#d8e1de;--pri:#0f6b6b;--pri2:#0b5555;--acc:#f0a22e;--accbg:#fff4de;--bad:#b3392f;--ok:#1d7a4d;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1a1b;--card:#142628;--ink:#e6efee;--mut:#98adab;--line:#264244;--pri:#3fb4ae;--pri2:#2e948f;--acc:#f0a22e;--accbg:#3a2d14;--bad:#ff8a7d;--ok:#6fd1a0;color-scheme:dark}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2,h3{font-family:'Bricolage Grotesque',Figtree,system-ui,sans-serif;margin:0;line-height:1.2}
+header{background:var(--pri2);color:#fff;padding:14px 20px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header h1{font-size:20px}header small{opacity:.8}
+header label{font-size:12px;opacity:.85;display:flex;gap:8px;align-items:center}
+header input{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;width:150px}
+main{max-width:1240px;margin:0 auto;padding:18px;display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:18px;align-items:start}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.col{display:grid;gap:18px;min-width:0}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+section>h2{font-size:17px;margin-bottom:12px;display:flex;gap:10px;align-items:center}
+.n{background:var(--pri);color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;flex:none}
+label.f{display:block;font-size:13px;color:var(--mut);margin-bottom:10px}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:4px;min-width:0}
+input[aria-invalid=true]{border-color:var(--bad)}
+.err{color:var(--bad);font-size:12px;min-height:0}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--pri);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px}
+.chip[aria-pressed=true]{background:var(--pri);border-color:var(--pri);color:#fff}
+.q{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px;margin-bottom:10px}
+.q.done{border-left-color:var(--ok);opacity:.85}
+.q p{margin:0 0 4px;font-weight:600}.q small{color:var(--mut);display:block;margin-bottom:8px}
+.q label.ck{font-size:12px;color:var(--mut);display:flex;gap:6px;align-items:center;margin-top:8px}
+.q label.ck input{width:auto;margin:0}
+.act{border:1px solid var(--acc);background:var(--accbg);border-radius:8px;padding:5px 10px;margin:0 6px 6px 0;cursor:pointer;font-size:13px}
+.act:hover{background:var(--acc);color:#10292c}
+.empty{color:var(--mut);padding:14px;border:1px dashed var(--line);border-radius:10px;text-align:center}
+.ln{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.ln.pri{border-color:var(--pri);box-shadow:inset 4px 0 0 var(--pri)}
+.top{display:flex;justify-content:space-between;gap:8px}.top small{color:var(--mut);display:block}
+.x{border:0;background:transparent;color:var(--bad);font-size:22px;line-height:1;cursor:pointer;padding:0 6px}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;align-items:end;margin-top:8px}
+.ctl label{font-size:12px;color:var(--mut)}.ctl select,.ctl input{margin-top:2px;padding:6px 8px}
+.lt{font-weight:700;font-size:16px;text-align:right}
+.why{margin:8px 0 0;font-size:13px;color:var(--mut)}.hint{color:var(--acc);font-weight:600}
+.tag{font-size:11px;background:var(--pri);color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.add{display:flex;gap:8px;margin:6px 0 14px}.add select{margin:0}
+.btn{background:var(--pri);color:#fff;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:600;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--pri2)}.btn.alt{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+.tot{background:var(--bg);border-radius:10px;padding:12px;display:grid;gap:4px}
+.tot div{display:flex;justify-content:space-between;gap:10px}.tot .g{font-size:18px;font-weight:700;border-top:1px solid var(--line);padding-top:6px;margin-top:4px}
+.warn{font-size:13px;color:var(--bad)}
+textarea{min-height:360px;line-height:1.5;resize:vertical}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.ok{color:var(--ok);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>HDU Healthcare · Enquiry & Package Assistant</h1><small>Capture the client, ask the right questions, send a personalised package.</small></div>
+  <label>Your name (for the signature)<input id="agent" placeholder="e.g. Rahul"></label>
+</header>
+<main>
+ <div class="col">
+  <section>
+   <h2><span class="n">1</span>Client details</h2>
+   <label class="f">Name<input id="name" autocomplete="off" placeholder="Client's name"></label>
+   <label class="f">Contact number<input id="phone" inputmode="tel" placeholder="10-digit mobile"><span class="err" id="e-phone"></span></label>
+   <div class="row2">
+    <label class="f">Location / area<input id="loc" placeholder="e.g. Andheri East, Mumbai"></label>
+    <label class="f">Pincode<input id="pin" inputmode="numeric" maxlength="6" placeholder="6 digits"><span class="err" id="e-pin"></span></label>
+   </div>
+   <label class="f">Requirement<select id="req"></select></label>
+   <div class="row2">
+    <div class="f" style="font-size:13px;color:var(--mut)">Rent or buy
+     <div><span class="seg" id="modeSeg"><button type="button" data-m="rent" aria-pressed="true">Rent</button><button type="button" data-m="buy" aria-pressed="false">Buy</button></span></div></div>
+    <label class="f">Days needed<input id="days" type="number" min="1" value="30"></label>
+   </div>
+   <div class="chips" id="dayChips"></div>
+  </section>
+  <section>
+   <h2><span class="n">2</span>Ask these 5 questions</h2>
+   <div id="qs"><div class="empty">Choose a requirement to see the questions.</div></div>
+  </section>
+ </div>
+ <div class="col">
+  <section>
+   <h2><span class="n">3</span>Package</h2>
+   <div class="chips" style="margin:0 0 12px" id="tiers"></div>
+   <div id="lines"><div class="empty">Choose a requirement to build the package.</div></div>
+   <div class="add"><select id="addSel" aria-label="Add an item"></select><button class="btn alt" id="addBtn" type="button">Add</button></div>
+   <div class="tot" id="tot"></div>
+  </section>
+  <section>
+   <h2><span class="n">4</span>Message to the client</h2>
+   <textarea id="msg" aria-label="Message"></textarea>
+   <div class="bar">
+    <button class="btn" id="copy" type="button">Copy message</button>
+    <a class="btn alt" id="wa" target="_blank" rel="noopener">Open in WhatsApp</a>
+    <button class="btn alt" id="regen" type="button">Reset to auto text</button>
+    <span class="ok" id="ok" role="status"></span>
+   </div>
+  </section>
+ </div>
+</main>
+<script>
+const W3=[[7,700],[15,1000],[30,1500]],E=[[15,6300],[30,10500]],M=p=>[[30,p]],D1=p=>[[1,p]];
+const IT=[],ITEM={};
+const I=(id,cat,name,spec,rent,buy,o={})=>{const x={id,cat,name,spec,rent:rent&&rent.map(([d,p])=>({d,p})),buy,...o};IT.push(x);ITEM[id]=x};
+const CATS={wheelchair:'Wheelchairs',electric:'Electric wheelchairs',walker:'Walker',commode:'Commode & shower chairs',bed:'Hospital beds',mattress:'Air mattresses',oxygen:'Oxygen',cpap:'CPAP / BiPAP',vent:'Ventilator & high-flow',device:'Monitors & ICU devices',service:'Care services'};
+I('wc-ryder1','wheelchair','Karma Ryder 1 wheelchair','100 kg capacity, foldable, 13 kg',W3,7990,{del:1000,dep:2000});
+I('wc-f4000','wheelchair','Forza Freedom 4000 wheelchair','125 kg capacity, aluminium frame',W3,13990,{del:1000,dep:2000});
+I('wc-km2500','wheelchair','Karma KM 2500 lightweight wheelchair','Only 9.2 kg, easy to lift into a car',W3,27990,{del:1000,dep:2000});
+I('wc-km5000','wheelchair','Karma KM 5000 F-14 premium wheelchair','Padded armrests, swing-away footrest',[[15,2500],[30,4500]],49990,{del:1500,dep:5000});
+I('wc-f6000','wheelchair','Forza Freedom 6000 LR reclining wheelchair','Reclining backrest, leg rest, 125 kg (min. 30 days)',M(4000),29990,{del:1500,dep:5000});
+I('wc-clem','wheelchair','Forza Clematis Pro tilt wheelchair','Tilt seat, adjustable backrest & legrests',[[15,2500],[30,4500]],49990,{del:1500,dep:5000});
+I('ew-esleh','electric','Esleh Classic electric wheelchair','Foldable, airline-safe lithium battery (GST incl.)',E,94990,{del:1500,dep:10000});
+I('ew-kp','electric','Karma KP 10.3S power wheelchair','125 kg, semi-foldable (GST incl.)',E,127990,{del:1500,dep:10000});
+I('ew-frido','electric','Frido Prime electric wheelchair','26 kg, lithium battery (GST incl.)',E,74990,{del:1500,dep:10000});
+I('wk-walker','walker','Walker','Adjustable, foldable',M(600),2640,{del:500});
+I('cm-aqua2','commode','Karma Aqua 2 commode chair','Foldable, height adjustable · free same-day delivery',null,4800);
+I('cm-aqua5','commode','Karma Aqua 5 commode chair (wheels)','Foldable, with wheels · free same-day delivery',null,4800);
+I('cm-vissco3','commode','Vissco Comfort 3-in-1 commode & shower chair','Commode, shower chair and toilet frame in one',null,5890);
+I('cm-vsh','commode','Vissco Comfort shower chair','Basic shower seat',null,3990);
+I('cm-frido2000','commode','Frido 2000 commode wheelchair','Cushioned, 125 kg, with footrest',null,13500);
+I('cm-v139','commode','Vermeiren 139 commode chair','Premium build',null,11990);
+I('cm-sas100','commode','Frido SAS100 shower commode wheelchair','Stainless steel SS304, 120 kg',null,23990);
+I('cm-v9300','commode','Vermeiren 9300 reclining commode chair','Premium reclining',null,24990);
+I('bd-single','bed','Single-function hospital bed','Manual bed with side rails (GST extra on rent)',M(3000),34990,{del:2500,gr:1});
+I('bd-3f','bed','3-function hospital bed','Head, knee and height adjustment · rate on request',M(0),null,{del:2500,q:1});
+I('bd-a5','bed','Paramount A5 5-function bed (Japan)','Premium bed (GST extra on rent)',M(10000),171100,{del:4200,dep:20000,gr:1});
+I('bd-rec','bed','Mattress recliner bed','Recliner with mattress (GST extra)',M(3000),27000,{del:2500,gr:1,gb:1});
+I('mt-drive','mattress','Drive alternating-pressure air mattress','Helps prevent bedsores',M(6000),48990,{del:1000,dep:10000});
+I('mt-arjo','mattress','Arjo air mattress','Premium, for high bedsore risk',M(11600),148000);
+I('ox-oxymed5','oxygen','Oxymed Mini 5 LPM oxygen concentrator','Home use, up to 5 L/min',M(4000),37990);
+I('ox-airsep5','oxygen','AirSep VisionAire 5L concentrator','Up to 5 L/min',M(4000),58990);
+I('ox-drive5','oxygen','Drive DeVilbiss 5L concentrator','Up to 5 L/min',M(4000),59990);
+I('ox-oxymed10','oxygen','Oxymed 10 LPM dual-flow concentrator','Up to 10 L/min, two patients',M(7000),59990);
+I('ox-airsep10','oxygen','AirSep 10 LPM concentrator','Up to 10 L/min',M(8000),165000,{del:1000});
+I('ox-drive10','oxygen','Drive DeVilbiss 10L concentrator','Up to 10 L/min',M(8000),127990);
+I('ox-rove6','oxygen','Inogen Rove 6 portable concentrator','Lightweight, travel-friendly (buy price from)',M(30000),245000,{del:1000,dep:25000});
+I('ox-cyl','oxygen','Oxygen cylinder (10 kg / 50 kg)','Backup for power cuts · rate on request',M(0),null,{q:1});
+I('cp-as10','cpap','ResMed AirSense 10 auto CPAP','For sleep apnoea (rent from)',M(4000),52990,{del:1000,dep:10000});
+I('cp-as11','cpap','ResMed AirSense 11 auto CPAP','Quieter, smart tracking (rent from)',M(5000),78990,{del:1000,dep:10000});
+I('bp-lumis','cpap','ResMed Lumis 150 ST BiPAP','For COPD / respiratory support (rent from)',M(5600),71990,{del:1000,dep:10000});
+I('cp-mask','cpap','CPAP / BiPAP mask','Sold separately',null,4000,{bo:1});
+I('vt-astral','vent','ResMed Astral 150 ventilator','Home ventilator',M(45000),450000,{del:1500,dep:50000});
+I('hf-airvo','vent','Fisher & Paykel AIRVO 2 high-flow','Heated humidified high-flow oxygen',M(50000),480000,{del:2000,dep:50000});
+I('mn-mindray','device','Mindray uMEC 100 patient monitor','Continuous vitals monitoring',M(7500),95000,{del:1000,dep:10000});
+I('mn-philips','device','Philips cardiac monitor','Cardiac monitoring',M(7500),110000);
+I('su-suction','device','Suction machine','For secretions / tracheostomy',M(2800),12500,{del:500});
+I('dv-kendall','device','Kendall DVT pump','Prevents clots in bed-bound patients',M(8000),113800);
+I('dv-arjo','device','Arjo Flowtron DVT pump','Prevents clots in bed-bound patients',M(8500),148000);
+I('dv-cuff','device','DVT pump cuff','Sold separately',null,3500,{bo:1});
+I('if-inf','device','Infusion pump','Controlled IV infusion',M(7500),75000);
+I('if-fres','device','Fresenius Kabi syringe pump','Precise drug delivery',M(7000),83990);
+I('sv-icu-stroke','service','Home ICU – Stroke patient','Bed 3F + bubble mattress, oxygen & suction, 24/7 nurse & attendant, physio (min. 7 days)',D1(7000),null,{sv:1,u:'day',min:7});
+I('sv-icu-std','service','Home ICU – Standard','Bed 3F + tubular mattress, BiPAP/CPAP, 24/7 nurse & attendant, weekly doctor visit (min. 7 days)',D1(9000),null,{sv:1,u:'day',min:7});
+I('sv-icu-adv','service','Home ICU – Advanced','Paramount 5F bed, Astral-150 ventilator, 5-para monitor, 24/7 registered nurse (min. 7 days)',D1(11000),null,{sv:1,u:'day',min:7});
+I('sv-nurse24','service','Nurse at home – 24 hrs','Rate confirmed after assessment',D1(0),null,{sv:1,u:'day',q:1});
+I('sv-nurse12','service','Nurse at home – 12 hrs (day or night)','Rate confirmed after assessment',D1(0),null,{sv:1,u:'day',q:1});
+I('sv-att24','service','Attendant – 24 hrs stay','Rate confirmed after assessment',D1(0),null,{sv:1,u:'day',q:1});
+I('sv-elder','service','Elderly care caregiver','Rate confirmed after assessment',D1(0),null,{sv:1,u:'day',q:1});
+I('sv-physio','service','Physiotherapy at home','Per session · rate confirmed',D1(0),null,{sv:1,u:'session',ds:7,q:1});
+I('sv-doctor','service','Doctor consultation at home','Per visit · rate confirmed',D1(0),null,{sv:1,u:'visit',ds:1,q:1});
+I('sv-ecg','service','ECG at home','Per test · rate confirmed',D1(0),null,{sv:1,u:'test',ds:1,q:1});
+I('sv-xray','service','X-ray at home','Per test · rate confirmed',D1(0),null,{sv:1,u:'test',ds:1,q:1});
+
+/* Requirement -> [label, group, primary item, question/package set] */
+const REQ={wheelchair:['Wheelchair','Mobility','wc-ryder1','mob'],electric:['Electric / power wheelchair','Mobility','ew-esleh','mob'],walker:['Walker','Mobility','wk-walker','mob'],commode:['Commode / shower chair','Mobility','cm-aqua5','com'],bed:['Hospital bed','Bed & comfort','bd-single','bed'],mattress:['Air mattress','Bed & comfort','mt-drive','mat'],oxygen:['Oxygen concentrator','Breathing','ox-oxymed5','oxy'],portable:['Portable oxygen (Inogen Rove 6)','Breathing','ox-rove6','oxy'],cpap:['CPAP machine','Breathing','cp-as10','cpap'],bipap:['BiPAP machine','Breathing','bp-lumis','cpap'],vent:['Ventilator','Breathing','vt-astral','vent'],icu:['Home ICU setup','ICU & devices','sv-icu-std','icu'],monitor:['Patient monitor','ICU & devices','mn-mindray','icu'],suction:['Suction machine','ICU & devices','su-suction','icu'],dvt:['DVT pump','ICU & devices','dv-kendall','icu'],infusion:['Infusion / syringe pump','ICU & devices','if-inf','icu'],nurse:['Nurse at home','Care services','sv-nurse24','care'],attendant:['Attendant (24 hrs stay)','Care services','sv-att24','care'],elderly:['Elderly care','Care services','sv-elder','care'],physio:['Physiotherapy at home','Care services','sv-physio','ther'],doctor:['Doctor / ECG / X-ray at home','Care services','sv-doctor','ther']};
+
+/* Questions: [question, why we ask (sales logic), [[button label, action]]]. Actions: add:[ids], swap:id, mode:'rent'|'buy' */
+const SETS={
+mob:{q:[
+ ['How long will the patient need it – a few weeks of recovery or long term?','Rent is cheapest short term (₹1,500/month) but buying from ₹7,990 wins after ~5 months.',[['Short term → rent',{mode:'rent'}],['Long term → buy',{mode:'buy'}]]],
+ ['What is the patient\'s weight, and can they sit upright for hours?','Over 100 kg or weak posture needs a 125 kg frame or a reclining back – a safer, higher-value model.',[['Over 100 kg / needs recline → Freedom 6000 LR',{swap:'wc-f6000'}]]],
+ ['Will they go out or travel – car trips, hospital visits, outings?','Frequent movement justifies a 9 kg lightweight chair or a motorised one.',[['Ultra-light → KM 2500',{swap:'wc-km2500'}],['Motorised → Esleh electric',{swap:'ew-esleh'}]]],
+ ['Can they reach the washroom and toilet on their own?','Toileting is the next big problem at home – a commode chair is the natural add-on.',[['Add commode chair',{add:['cm-aqua5']}],['Add walker',{add:['wk-walker']}]]],
+ ['Do they spend long hours in bed, or have any skin or pressure-sore concerns?','Bed-bound hours need a proper bed and an air mattress – our highest-value cross-sell.',[['Add hospital bed',{add:['bd-single']}],['Add air mattress',{add:['mt-drive']}]]]],
+ pkg:[['cm-aqua5',2,'Toilet support so they are not lifted or moved unsafely.'],['wk-walker',2,'Helps them stand and practise walking as they recover.'],['bd-single',3,'Adjustable bed with rails for rest and safe transfers.'],['mt-drive',3,'Prevents bedsores during long hours of rest.'],['sv-physio',3,'Home physio speeds up getting back on their feet.']]},
+com:{q:[
+ ['Is it for bedside use only, or also for showers?','Shower use points to the 3-in-1 – a better product at a small price step.',[['Shower + commode → Vissco 3-in-1',{swap:'cm-vissco3'}]]],
+ ['What is the patient\'s weight, and do they need cushioning or wheels?','Heavier or frail patients need the cushioned 125 kg wheeled model.',[['Wheeled & cushioned → Frido 2000',{swap:'cm-frido2000'}]]],
+ ['Can they walk or transfer without help?','If not, a wheelchair and walker prevent falls on the way to the toilet.',[['Add wheelchair',{add:['wc-ryder1']}],['Add walker',{add:['wk-walker']}]]],
+ ['Are they mostly in bed?','Bed-bound patients need a hospital bed and pressure-relief mattress.',[['Add hospital bed',{add:['bd-single']}],['Add air mattress',{add:['mt-drive']}]]],
+ ['Who helps with toileting and bathing, and at what hours?','No reliable helper means an attendant is needed for safety and dignity.',[['Add 24-hr attendant',{add:['sv-att24']}],['Add 12-hr nurse',{add:['sv-nurse12']}]]]],
+ pkg:[['wc-ryder1',2,'Safe movement to and from the washroom.'],['wk-walker',2,'Support for standing and short walks.'],['bd-single',3,'Adjustable bed with rails.'],['mt-drive',3,'Bedsore prevention.'],['sv-att24',3,'Help with hygiene and transfers.']]},
+bed:{q:[
+ ['Is the patient fully bedridden, or can they sit up with help?','Fully bedridden or post-ICU needs more adjustment (3-function / 5-function).',[['Needs head & knee lift → 3-function',{swap:'bd-3f'}],['Post-ICU → Paramount A5',{swap:'bd-a5'}]]],
+ ['Is there any pressure sore, or will they lie down most of the day?','An air mattress is essential once someone is in bed for weeks.',[['Add air mattress',{add:['mt-drive']}],['Premium → Arjo mattress',{add:['mt-arjo']}]]],
+ ['Does the patient need oxygen or breathing support, especially at night?','Many bed-rest patients need oxygen or CPAP/BiPAP at some point.',[['Add oxygen concentrator',{add:['ox-oxymed5']}],['Add CPAP',{add:['cp-as10']}]]],
+ ['Who looks after the patient day and night?','Caregiver cover is the biggest worry for families – offer nurse or attendant.',[['Add 24-hr attendant',{add:['sv-att24']}],['Add 12-hr nurse',{add:['sv-nurse12']}]]],
+ ['How will they reach the toilet or move out of bed?','A wheelchair and commode complete the setup.',[['Add wheelchair',{add:['wc-ryder1']}],['Add commode',{add:['cm-aqua5']}]]]],
+ pkg:[['mt-drive',2,'Prevents bedsores from long hours in bed.'],['wc-ryder1',2,'Lets them sit out of bed and move around.'],['ox-oxymed5',3,'Oxygen on hand if breathing drops.'],['cm-aqua5',3,'Safe toileting next to the bed.'],['sv-att24',3,'Round-the-clock help.']]},
+mat:{q:[
+ ['Is there already a pressure sore, and at what stage?','An existing sore means the premium Arjo mattress is justified.',[['Existing sore → Arjo air mattress',{swap:'mt-arjo'}]]],
+ ['Do they already have a hospital bed?','The mattress works best on an adjustable bed with rails.',[['Add hospital bed',{add:['bd-single']}]]],
+ ['How many hours a day do they lie down?','Over 16 hours a day means the patient needs repositioning help.',[['Add 24-hr attendant',{add:['sv-att24']}],['Add 12-hr nurse',{add:['sv-nurse12']}]]],
+ ['Do they need a doctor or wound dressing visits?','Skin care is clinical – offer a doctor visit or nurse.',[['Add doctor visit',{add:['sv-doctor']}],['Add nurse',{add:['sv-nurse12']}]]],
+ ['Do they do any physiotherapy to stay mobile?','Mobility keeps circulation up and reduces sore risk.',[['Add physiotherapy',{add:['sv-physio']}],['Add wheelchair',{add:['wc-ryder1']}]]]],
+ pkg:[['bd-single',2,'Proper bed with rails to match the mattress.'],['sv-physio',2,'Movement and circulation support.'],['sv-nurse12',3,'Skin checks, repositioning and dressings.'],['sv-doctor',3,'Medical review of skin and overall health.'],['wc-ryder1',3,'Sit-out time during the day.']]},
+oxy:{q:[
+ ['What flow rate (L/min) has the doctor prescribed?','Above 5 L/min needs a 10 LPM machine – the higher-value option.',[['6–10 L/min → 10 LPM',{swap:'ox-oxymed10'}]]],
+ ['Is oxygen used day and night, or does the patient travel or go out?','Mobile patients should have the portable Inogen Rove 6.',[['Needs to travel → Inogen Rove 6',{swap:'ox-rove6'}]]],
+ ['Is there a risk of power cuts?','A cylinder backup protects the patient and builds trust.',[['Add oxygen cylinder backup',{add:['ox-cyl']}]]],
+ ['Do they also use CPAP/BiPAP, or have sleep apnoea or COPD?','A second respiratory device is a common companion need.',[['Add CPAP',{add:['cp-as10']}],['Add BiPAP',{add:['bp-lumis']}]]],
+ ['Do they need a bed, SpO₂ monitoring or a nurse?','Breathing patients often need a bed and monitoring for safe care.',[['Add hospital bed',{add:['bd-single']}],['Add patient monitor',{add:['mn-mindray']}]]]],
+ pkg:[['ox-cyl',2,'Backup supply during a power cut.'],['bd-single',2,'Head-end elevation helps breathing.'],['mn-mindray',3,'Tracks SpO₂ and heart rate continuously.'],['sv-nurse12',3,'A nurse to monitor and respond.']]},
+cpap:{q:[
+ ['Has the doctor prescribed CPAP (sleep apnoea) or BiPAP (COPD / respiratory failure)?','Confirms the right machine and avoids a wrong rental.',[['BiPAP prescribed → Lumis 150 ST',{swap:'bp-lumis'}],['Quieter smart CPAP → AirSense 11',{swap:'cp-as11'}]]],
+ ['Do they already have a mask and tubing?','A mask is almost always needed and is sold separately.',[['Add mask (₹4,000)',{add:['cp-mask']}]]],
+ ['Do they need supplemental oxygen along with the machine?','Many users need oxygen alongside for night-time dips.',[['Add oxygen concentrator',{add:['ox-oxymed5']}]]],
+ ['Will they use it for months or years?','Beyond about 10 months, buying costs less than renting.',[['Long term → buy',{mode:'buy'}],['Short term → rent',{mode:'rent'}]]],
+ ['Does someone watch their oxygen level at night?','A night nurse or monitor adds safety for high-risk patients.',[['Add night nurse',{add:['sv-nurse12']}],['Add patient monitor',{add:['mn-mindray']}]]]],
+ pkg:[['cp-mask',2,'Every user needs a well-fitting mask.'],['ox-oxymed5',2,'Oxygen support alongside therapy.'],['mn-mindray',3,'Watches SpO₂ through the night.'],['sv-nurse12',3,'Night nurse for high-risk patients.']]},
+vent:{q:[
+ ['Is the patient being discharged from ICU, and on what date?','A discharge date lets us plan a complete Home ICU instead of one device.',[['Full Advanced Home ICU',{add:['sv-icu-adv']}]]],
+ ['Does the patient have a tracheostomy or secretions?','Suction is needed daily with a tracheostomy.',[['Add suction machine',{add:['su-suction']}]]],
+ ['Is oxygen needed, and is there a backup for power cuts?','Ventilator patients can never be left without oxygen.',[['Add 10 LPM concentrator',{add:['ox-oxymed10']}],['Add cylinder',{add:['ox-cyl']}]]],
+ ['Is a monitor needed for vitals?','Continuous vitals are standard in a safe home ICU.',[['Add patient monitor',{add:['mn-mindray']}]]],
+ ['Will an ICU-trained nurse be present 24 hours?','No trained cover means the family carries the risk.',[['Add 24-hr nurse',{add:['sv-nurse24']}],['Add doctor visits',{add:['sv-doctor']}]]]],
+ pkg:[['su-suction',2,'Clears secretions safely.'],['mn-mindray',2,'Continuous vitals.'],['ox-cyl',2,'Backup oxygen.'],['bd-a5',3,'ICU-grade 5-function bed.'],['mt-drive',3,'Bedsore prevention.'],['sv-nurse24',3,'ICU-trained 24-hr nurse.'],['sv-doctor',3,'Regular doctor review.']]},
+icu:{q:[
+ ['What is the diagnosis, and when is the discharge?','Stroke, cardiac or respiratory cases map to different ICU packages.',[['Stroke → Stroke ICU',{swap:'sv-icu-stroke'}],['Ventilator needed → Advanced ICU',{swap:'sv-icu-adv'}]]],
+ ['Does the patient need oxygen, BiPAP or a ventilator?','Respiratory support decides Standard vs Advanced ICU.',[['Add BiPAP',{add:['bp-lumis']}],['Add oxygen',{add:['ox-oxymed10']}]]],
+ ['Should nursing cover be 24 hours or 12 hours?','Nursing is the biggest recurring spend and safety factor.',[['Add 24-hr nurse',{add:['sv-nurse24']}],['Add 12-hr nurse',{add:['sv-nurse12']}]]],
+ ['Will the patient be bed-bound for more than 2 weeks?','Long bed rest brings clot and bedsore risk.',[['Add DVT pump',{add:['dv-kendall']}],['Add air mattress',{add:['mt-drive']}]]],
+ ['Do they need infusions, ECG or doctor visits at home?','Saves repeated hospital trips.',[['Add infusion pump',{add:['if-inf']}],['Add ECG at home',{add:['sv-ecg']}]]]],
+ pkg:[['mn-mindray',2,'Continuous vitals monitoring.'],['su-suction',2,'Clears secretions.'],['ox-cyl',2,'Backup oxygen.'],['mt-drive',3,'Bedsore prevention.'],['dv-kendall',3,'Reduces clot risk.'],['sv-doctor',3,'Regular doctor visits.']]},
+care:{q:[
+ ['Does the patient need medical care (injections, wound care, tube feeding) or only daily-living help?','Decides nurse vs attendant – and the price.',[['Medical → Nurse',{swap:'sv-nurse24'}],['Daily help → Attendant',{swap:'sv-att24'}]]],
+ ['Is cover needed for 24 hours, or 12 hours (day or night)?','Right-sizing builds trust; 24-hr is the safer default.',[['12-hr → nurse',{swap:'sv-nurse12'}]]],
+ ['What equipment is already at home – bed, mattress, oxygen?','Missing equipment makes any care plan unsafe.',[['Add bed',{add:['bd-single']}],['Add mattress',{add:['mt-drive']}],['Add oxygen',{add:['ox-oxymed5']}]]],
+ ['How do they move and use the toilet?','Mobility aids make the caregiver\'s job safer.',[['Add wheelchair',{add:['wc-ryder1']}],['Add commode',{add:['cm-aqua5']}]]],
+ ['Do they need physiotherapy or regular doctor visits?','Therapy and review keep recovery on track.',[['Add physio',{add:['sv-physio']}],['Add doctor visit',{add:['sv-doctor']}]]]],
+ pkg:[['bd-single',2,'Adjustable bed makes care easier and safer.'],['mt-drive',2,'Bedsore prevention.'],['wc-ryder1',2,'Mobility for sit-out time.'],['cm-aqua5',3,'Safe toileting.'],['sv-physio',3,'Rehabilitation at home.'],['sv-doctor',3,'Medical review.']]},
+ther:{q:[
+ ['What is the condition, and is the patient bed-bound?','Bed-bound patients need a bed and mattress on top of therapy.',[['Add hospital bed',{add:['bd-single']}],['Add air mattress',{add:['mt-drive']}]]],
+ ['How many sessions or visits per week are planned?','Longer plans work out cheaper and more consistent.',[]],
+ ['Do they need a walking aid or wheelchair for exercises?','Equipment makes sessions safer and more effective.',[['Add walker',{add:['wk-walker']}],['Add wheelchair',{add:['wc-ryder1']}]]],
+ ['Do they need regular vitals, ECG or X-ray?','Combined diagnostics at home save hospital trips.',[['Add ECG',{add:['sv-ecg']}],['Add doctor visit',{add:['sv-doctor']}]]],
+ ['Is a caregiver present between sessions?','Practice between sessions drives recovery.',[['Add attendant',{add:['sv-att24']}],['Add 12-hr nurse',{add:['sv-nurse12']}]]]],
+ pkg:[['wk-walker',2,'Support for exercises.'],['sv-doctor',2,'Medical review alongside therapy.'],['wc-ryder1',3,'Mobility between sessions.'],['sv-att24',3,'Daily practice and support.'],['bd-single',3,'Comfortable rest and safe transfers.']]}
+};
+
+const $=s=>document.querySelector(s),inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const S={req:'',mode:'rent',days:30,tier:2,lines:[],ans:{},edited:false};let UID=0;
+
+function defLine(id,why){
+ const it=ITEM[id],D=Math.max(1,+S.days||1);
+ let mode=it.sv?'rent':it.bo?'buy':(S.mode==='buy'&&it.buy!=null)?'buy':(it.rent?'rent':'buy');
+ const l={uid:++UID,id,mode,oi:0,per:1,qty:1,price:null,why:why||''};
+ if(mode==='rent'&&it.rent){
+  if(it.sv){l.per=it.u==='day'?Math.max(D,it.min||1):(it.ds||1)}
+  else{let b=1e18;it.rent.forEach((o,i)=>{const p=Math.ceil(D/o.d),c=p*o.p;if(c<b||(c===b&&o.d>it.rent[l.oi].d)){b=c;l.oi=i;l.per=p}})}
+ }
+ return l}
+const prim=()=>S.lines.find(l=>l.primary);
+function unit(l){const it=ITEM[l.id];if(l.price!==null&&l.price!=='')return +l.price||0;return l.mode==='buy'?(it.buy||0):(it.rent[l.oi]?it.rent[l.oi].p:0)}
+function ltotal(l){const it=ITEM[l.id],g=l.mode==='buy'?it.gb:it.gr;const per=l.mode==='buy'?1:l.per;return unit(l)*per*l.qty*(g?1.18:1)}
+const unpriced=l=>ITEM[l.id].q&&(l.price===null||l.price==='');
+function dur(l){const it=ITEM[l.id];if(l.mode==='buy')return'Purchase';
+ if(it.sv)return it.u==='day'?l.per+' day'+(l.per>1?'s':''):l.per+' '+it.u+(l.per>1?'s':'');
+ return (it.rent[l.oi].d*l.per)+' days'}
+function sums(){let rent=0,buy=0,svc=0,del=0,dep=0,un=[];
+ S.lines.forEach(l=>{const it=ITEM[l.id],t=ltotal(l);
+  if(unpriced(l))un.push(it.name);
+  if(it.sv)svc+=t;else if(l.mode==='buy')buy+=t;else{rent+=t;del+=(it.del||0);dep+=(it.dep||0)*l.qty}});
+ return{rent,buy,svc,del,dep,un,sub:rent+buy+svc,total:rent+buy+svc+del+dep}}
+
+function init(){
+ const sel=$('#req');sel.innerHTML='<option value="">Select requirement…</option>';
+ const g={};Object.entries(REQ).forEach(([k,v])=>(g[v[1]]=g[v[1]]||[]).push([k,v[0]]));
+ Object.entries(g).forEach(([n,a])=>{sel.insertAdjacentHTML('beforeend',`<optgroup label="${n}">${a.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</optgroup>`)});
+ $('#dayChips').innerHTML=[7,15,30,60,90,180].map(d=>`<button type="button" class="chip" data-d="${d}" aria-pressed="${d===30}">${d} days</button>`).join('');
+ $('#tiers').innerHTML=[[1,'Essential'],[2,'Recommended'],[3,'Complete']].map(([t,l])=>`<button type="button" class="chip" data-t="${t}" aria-pressed="${t===2}">${l} package</button>`).join('');
+ const as=$('#addSel');as.innerHTML='<option value="">Add another item or service…</option>';
+ Object.entries(CATS).forEach(([c,l])=>as.insertAdjacentHTML('beforeend',`<optgroup label="${l}">${IT.filter(x=>x.cat===c).map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</optgroup>`));
+ try{$('#agent').value=localStorage.getItem('hdu_agent')||''}catch(e){}
+ renderAll()}
+
+function buildPackage(){
+ if(!S.req){S.lines=[];return}
+ const [,,pid,set]=REQ[S.req],old=prim();
+ const p=old&&ITEM[old.id].cat===ITEM[pid].cat?old:defLine(pid,'');
+ p.primary=true;p.why='';
+ S.lines=[p].concat(SETS[set].pkg.filter(x=>x[1]<=S.tier&&x[0]!==p.id).map(x=>defLine(x[0],x[2])))}
+function recalc(){const keep=S.lines.map(l=>({o:l,n:defLine(l.id,l.why)}));
+ S.lines=keep.map(({o,n})=>{n.primary=o.primary;n.qty=o.qty;n.price=o.price;return n})}
+
+function renderQs(){
+ if(!S.req){$('#qs').innerHTML='<div class="empty">Choose a requirement to see the questions.</div>';return}
+ const qs=SETS[REQ[S.req][3]].q;
+ $('#qs').innerHTML=qs.map((q,i)=>`<div class="q ${S.ans[i]?'done':''}"><p>${i+1}. ${q[0]}</p><small>Why ask: ${q[1]}</small>${q[2].map((a,j)=>`<button type="button" class="act" data-q="${i}" data-a="${j}">${a[0]}</button>`).join('')}<label class="ck"><input type="checkbox" data-ck="${i}" ${S.ans[i]?'checked':''}> Asked</label></div>`).join('')}
+
+function renderLines(){
+ if(!S.lines.length){$('#lines').innerHTML='<div class="empty">Choose a requirement to build the package.</div>';refresh();return}
+ $('#lines').innerHTML=S.lines.map(l=>{
+  const it=ITEM[l.id],sib=IT.filter(x=>x.cat===it.cat);
+  const both=!it.sv&&!it.bo&&it.buy!=null&&it.rent;
+  return `<div class="ln ${l.primary?'pri':''}" data-u="${l.uid}"><div class="top"><div><strong>${it.name}</strong>${l.primary?'<span class="tag">Requested</span>':''}<small>${it.spec}</small></div><button class="x" data-rm="${l.uid}" aria-label="Remove ${it.name}">×</button></div>
+  <div class="ctl"><label>Model<select data-f="id">${sib.map(x=>`<option value="${x.id}" ${x.id===l.id?'selected':''}>${x.name}</option>`).join('')}</select></label>
+  ${both?`<label>Type<select data-f="mode"><option value="rent" ${l.mode==='rent'?'selected':''}>Rent</option><option value="buy" ${l.mode==='buy'?'selected':''}>Buy</option></select></label>`:''}
+  ${l.mode==='rent'&&!it.sv&&it.rent.length>1?`<label>Duration<select data-f="oi">${it.rent.map((o,i)=>`<option value="${i}" ${i===l.oi?'selected':''}>${o.d} days</option>`).join('')}</select></label>`:''}
+  ${l.mode==='rent'?`<label>${it.sv?(it.u==='day'?'Days':it.u+'s'):'Periods'}<input type="number" min="1" data-f="per" value="${l.per}"></label>`:''}
+  <label>Qty<input type="number" min="1" data-f="qty" value="${l.qty}"></label>
+  <label>${unpriced(l)?'Enter rate ₹':'Rate ₹ (edit)'}<input type="number" min="0" data-f="price" value="${l.price===null?'':l.price}" placeholder="${it.q?'rate':unit({...l,price:null})}"></label>
+  <div class="lt" id="t-${l.uid}"></div></div><p class="why" id="w-${l.uid}"></p></div>`}).join('');
+ refresh()}
+
+function hint(l){const it=ITEM[l.id];let h=l.why?l.why:'';
+ if(l.mode==='rent'&&it.buy&&!it.sv){const r=ltotal(l);if(r>=it.buy*.5)h+=` <span class="hint">Rent so far is ${Math.round(r/it.buy*100)}% of the buy price (${inr(it.buy)}) – offer Buy.</span>`}
+ return h}
+function refresh(){
+ S.lines.forEach(l=>{const t=$('#t-'+l.uid),w=$('#w-'+l.uid);if(t)t.textContent=unpriced(l)?'Rate needed':inr(ltotal(l));if(w)w.innerHTML=hint(l)});
+ const s=sums();
+ $('#tot').innerHTML=S.lines.length?`<div><span>Rent</span><span>${inr(s.rent)}</span></div><div><span>Purchases</span><span>${inr(s.buy)}</span></div><div><span>Services</span><span>${inr(s.svc)}</span></div><div><span>Delivery & pickup (one-time)</span><span>${inr(s.del)}</span></div><div><span>Refundable security deposit</span><span>${inr(s.dep)}</span></div><div class="g"><span>Total payable (incl. deposit)</span><span>${inr(s.total)}</span></div>${s.un.length?`<div class="warn">Rate still needed for: ${s.un.join(', ')}</div>`:''}`:'';
+ if(!S.edited)$('#msg').value=makeMsg();
+ const ph=cleanPhone();$('#wa').href=ph?`https://wa.me/91${ph}?text=${encodeURIComponent($('#msg').value)}`:'#';
+ $('#wa').style.opacity=ph?1:.5}
+function renderAll(){renderQs();renderLines()}
+
+function cleanPhone(){const p=$('#phone').value.replace(/[\s\-+]/g,'').replace(/^(91|0)(?=\d{10}$)/,'');return/^[6-9]\d{9}$/.test(p)?p:''}
+function cap(s){return s.trim().split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')}
+function makeMsg(){
+ const name=cap($('#name').value),loc=$('#loc').value.trim(),pin=$('#pin').value.trim(),agent=$('#agent').value.trim();
+ const s=sums(),r=S.req?REQ[S.req][0].toLowerCase():'';
+ const row=l=>{const it=ITEM[l.id];return `• ${l.qty>1?l.qty+' × ':''}${it.name} – ${dur(l)} – ${unpriced(l)?'rate shared after assessment':inr(ltotal(l))}`};
+ const main=S.lines.filter(l=>l.primary),extra=S.lines.filter(l=>!l.primary);
+ let m=`Hello ${name||'there'},\n\nThank you for contacting HDU Healthcare${r?` about ${r}`:''}${loc?` for ${loc}${pin?' – '+pin:''}`:''}. I have put together a package based on what families in your situation usually need.\n`;
+ if(main.length)m+=`\n*What you asked for*\n${main.map(row).join('\n')}\n`;
+ if(extra.length)m+=`\n*What you may also need*\n${extra.map(l=>row(l)+(l.why?`\n   ${l.why}`:'')).join('\n')}\n`;
+ if(S.lines.length){m+=`\n*Payment summary*\nRent / purchase / services: ${inr(s.sub)}`;
+  if(s.del)m+=`\nDelivery & pickup (one-time): ${inr(s.del)}`;
+  if(s.dep)m+=`\nSecurity deposit (refundable): ${inr(s.dep)}`;
+  m+=`\n*Total payable: ${inr(s.total)}*`;
+  if(s.dep)m+=` (includes the refundable deposit, returned when the equipment is picked up)`;
+  if(s.un.length)m+=`\nRates for ${s.un.join(', ')} will be confirmed after a quick assessment.`;
+  m+=`\nGST is included where applicable. Medicines and lab tests are extra for ICU and nursing services.\n`;
+  m+=`\nSame-day delivery is available in Mumbai, Delhi NCR and Bengaluru. Would you like me to confirm this for you? Reply YES and I will arrange delivery.\n`}
+ m+=`\nWarm regards,\n${agent||'HDU Healthcare Team'}\nHDU Healthcare | +91 95600 89955`;
+ return m}
+
+function act(i,j){const a=SETS[REQ[S.req][3]].q[i][2][j][1];S.ans[i]=1;
+ if(a.mode){S.mode=a.mode;document.querySelectorAll('#modeSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===a.mode));recalc()}
+ if(a.swap){const p=prim(),it=ITEM[a.swap];
+  if(p&&ITEM[p.id].cat===it.cat){const n=defLine(a.swap,'');n.primary=true;n.qty=p.qty;S.lines[S.lines.indexOf(p)]=n}
+  else if(!S.lines.some(l=>l.id===a.swap))S.lines.push(defLine(a.swap,'Added from your answer.'))}
+ (a.add||[]).forEach(id=>{if(!S.lines.some(l=>l.id===id))S.lines.push(defLine(id,'Added from your answer.'))});
+ S.edited=false;renderQs();renderLines()}
+
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.m){S.mode=t.dataset.m;document.querySelectorAll('#modeSeg button').forEach(b=>b.setAttribute('aria-pressed',b===t));recalc();S.edited=false;renderLines()}
+ else if(t.dataset.d){$('#days').value=t.dataset.d;setDays()}
+ else if(t.dataset.t){S.tier=+t.dataset.t;document.querySelectorAll('#tiers .chip').forEach(b=>b.setAttribute('aria-pressed',b===t));S.edited=false;buildPackage();renderLines()}
+ else if(t.dataset.q!==undefined)act(+t.dataset.q,+t.dataset.a);
+ else if(t.dataset.rm){S.lines=S.lines.filter(l=>l.uid!=t.dataset.rm);S.edited=false;renderLines()}
+});
+function setDays(){S.days=Math.max(1,+$('#days').value||1);document.querySelectorAll('#dayChips .chip').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===S.days));recalc();S.edited=false;renderLines()}
+$('#days').addEventListener('change',setDays);
+$('#req').addEventListener('change',e=>{S.req=e.target.value;S.ans={};S.lines=[];S.edited=false;buildPackage();renderAll()});
+$('#addBtn').addEventListener('click',()=>{const id=$('#addSel').value;if(!id)return;if(!S.lines.some(l=>l.id===id))S.lines.push(defLine(id,''));$('#addSel').value='';S.edited=false;renderLines()});
+document.addEventListener('change',e=>{
+ const c=e.target;
+ if(c.dataset.ck!==undefined){S.ans[c.dataset.ck]=c.checked?1:0;renderQs();return}
+ const row=c.closest('.ln');if(!row||!c.dataset.f)return;
+ const l=S.lines.find(x=>x.uid==row.dataset.u),f=c.dataset.f;
+ if(f==='id'){const n=defLine(c.value,l.why);n.primary=l.primary;n.qty=l.qty;S.lines[S.lines.indexOf(l)]=n;S.edited=false;renderLines()}
+ else if(f==='mode'||f==='oi'){if(f==='mode'){const n=defLine(l.id,l.why);Object.assign(l,n,{uid:l.uid,primary:l.primary,qty:l.qty,price:null,mode:c.value});if(c.value==='rent'){const m=defLine(l.id,l.why);l.oi=m.oi;l.per=m.per}else{l.per=1}}else l.oi=+c.value;S.edited=false;renderLines()}
+});
+document.addEventListener('input',e=>{
+ const c=e.target;
+ if(c.dataset.f&&['per','qty','price'].includes(c.dataset.f)){const l=S.lines.find(x=>x.uid==c.closest('.ln').dataset.u);const v=c.value;
+  l[c.dataset.f]=c.dataset.f==='price'?(v===''?null:+v):Math.max(1,+v||1);S.edited=false;refresh();return}
+ if(['name','loc','pin','phone','agent'].includes(c.id)){
+  if(c.id==='phone'){const bad=c.value&&!cleanPhone();c.setAttribute('aria-invalid',bad);$('#e-phone').textContent=bad?'Enter a valid 10-digit mobile number.':''}
+  if(c.id==='pin'){const bad=c.value&&!/^\d{6}$/.test(c.value);c.setAttribute('aria-invalid',bad);$('#e-pin').textContent=bad?'Pincode must be 6 digits.':''}
+  if(c.id==='agent'){try{localStorage.setItem('hdu_agent',c.value)}catch(x){}}
+  S.edited=false;refresh()}
+ if(c.id==='msg'){S.edited=true;const ph=cleanPhone();$('#wa').href=ph?`https://wa.me/91${ph}?text=${encodeURIComponent(c.value)}`:'#'}
+});
+$('#regen').addEventListener('click',()=>{S.edited=false;refresh()});
+$('#copy').addEventListener('click',async()=>{
+ const v=$('#msg').value;let ok=true;
+ try{await navigator.clipboard.writeText(v)}catch(e){try{$('#msg').select();ok=document.execCommand('copy')}catch(x){ok=false}}
+ $('#ok').textContent=ok?'Copied – paste it into WhatsApp or SMS.':'Copy failed – select the text and copy manually.';setTimeout(()=>$('#ok').textContent='',3500)});
+init();
+</script>
+</body>
+</html>
